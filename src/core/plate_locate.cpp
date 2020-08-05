@@ -806,7 +806,7 @@ int CPlateLocate::plateMserLocate(Mat src, vector<CPlate> &candPlates, int img_i
     }
   }
 
-  if (0) {
+  if (1) {
     imshow("src", src);
     waitKey(0);
     destroyWindow("src");

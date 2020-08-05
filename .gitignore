@@ -1,12 +1,10 @@
 .idea/
 _build/
 resources/image/tmp/
-*.lib
 *.suo
 *.sdf
 *.opensdf
 *.exe
-*.dll
 *.ilk
 *.pdb
 experi
