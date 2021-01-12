@@ -106,7 +106,9 @@ int CPlateLocate::mserSearch(const Mat &src,  vector<Mat> &out,
   return 0;
 }
 
+/*
 
+*/
 int CPlateLocate::colorSearch(const Mat &src, const Color r, Mat &out,
                               vector<RotatedRect> &outRects) {
   Mat match_grey;
@@ -118,19 +120,21 @@ int CPlateLocate::colorSearch(const Mat &src, const Color r, Mat &out,
   colorMatch(src, match_grey, r, false);
   SHOW_IMAGE(match_grey, 0);
 
+
   Mat src_threshold;
   threshold(match_grey, src_threshold, 0, 255,
-            CV_THRESH_OTSU + CV_THRESH_BINARY);
+            CV_THRESH_OTSU + CV_THRESH_BINARY);//二值化， 0或255
 
   Mat element = getStructuringElement(
       MORPH_RECT, Size(color_morph_width, color_morph_height));
+
   morphologyEx(src_threshold, src_threshold, MORPH_CLOSE, element);
 
-  //if (m_debug) {
-  //  utils::imwrite("resources/image/tmp/color.jpg", src_threshold);
-  //}
+
+
 
   src_threshold.copyTo(out);
+
 
 
   vector<vector<Point>> contours;
@@ -139,6 +143,7 @@ int CPlateLocate::colorSearch(const Mat &src, const Color r, Mat &out,
                contours,               // a vector of contours
                CV_RETR_EXTERNAL,
                CV_CHAIN_APPROX_NONE);  // all pixels of each contours
+
 
   vector<vector<Point>>::iterator itc = contours.begin();
   while (itc != contours.end()) {
@@ -806,7 +811,7 @@ int CPlateLocate::plateMserLocate(Mat src, vector<CPlate> &candPlates, int img_i
     }
   }
 
-  if (1) {
+  if (0) {
     imshow("src", src);
     waitKey(0);
     destroyWindow("src");
@@ -962,7 +967,7 @@ int CPlateLocate::plateSobelLocate(Mat src, vector<CPlate> &candPlates,
   //  candPlates.push_back(plates[i]);
 
   candPlates.insert(candPlates.end(), plates.begin(), plates.end());
-
+  //   utils::imwrite("resources/image/tmp/match_grey.jpg", match_grey);
   return 0;
 }
 

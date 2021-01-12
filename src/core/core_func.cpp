@@ -38,8 +38,8 @@ namespace easypr {
     cvtColor(src, src_hsv, CV_BGR2HSV);
 
     std::vector<cv::Mat> hsvSplit;
-    split(src_hsv, hsvSplit);
-    equalizeHist(hsvSplit[2], hsvSplit[2]);
+    split(src_hsv, hsvSplit);//通道分离 hsv
+    equalizeHist(hsvSplit[2], hsvSplit[2]);//直方图均衡化
     merge(hsvSplit, src_hsv);
 
     // match to find the color
