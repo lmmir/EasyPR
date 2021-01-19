@@ -38,7 +38,12 @@ namespace easypr {
     cvtColor(src, src_hsv, CV_BGR2HSV);
 
     std::vector<cv::Mat> hsvSplit;
-    split(src_hsv, hsvSplit);//通道分离 hsv
+    split(src_hsv, hsvSplit);//通道分离 hsv,
+	/*
+	对彩色图像进行直方图均衡化，一般是通过对HSV色彩空间的V通道进行直方图均衡化，再合并H，S，V三个通道后转化为RGB空间。
+	（其实V通道简单来说就是图像明暗通道，增加V通道值的效果等同于windows照片编辑中的光线调整，S通道则相当于windows照片编辑中的颜色调整（饱和度））
+	https://blog.csdn.net/normol/article/details/107834808
+	*/
     equalizeHist(hsvSplit[2], hsvSplit[2]);//直方图均衡化
     merge(hsvSplit, src_hsv);
 
@@ -136,11 +141,13 @@ namespace easypr {
 
     // get the final binary
 
+
     Mat src_grey;
     std::vector<cv::Mat> hsvSplit_done;
     split(src_hsv, hsvSplit_done);
     src_grey = hsvSplit_done[2];
-
+	imshow("imgName", src_grey);
+	waitKey(0);
     match = src_grey;
 
     return src_grey;
