@@ -7,288 +7,289 @@
 #include <ctime>
 
 namespace easypr {
-  Mat colorMatch(const Mat &src, Mat &match, const Color r,
-    const bool adaptive_minsv) {
+	Mat colorMatch(const Mat &src, Mat &match, const Color r,
+		const bool adaptive_minsv) {
 
-    // if use adaptive_minsv
-    // min value of s and v is adaptive to h
-    const float max_sv = 255;
-    const float minref_sv = 64;
+		// if use adaptive_minsv
+		// min value of s and v is adaptive to h
+		const float max_sv = 255;
+		const float minref_sv = 64;
 
-    const float minabs_sv = 95; //95;
+		const float minabs_sv = 95; //95;
 
-    // H range of blue 
+		// H range of blue 
 
-    const int min_blue = 100;  // 100
-    const int max_blue = 140;  // 140
+		const int min_blue = 100;  // 100
+		const int max_blue = 140;  // 140
 
-    // H range of yellow
+		// H range of yellow
 
-    const int min_yellow = 15;  // 15
-    const int max_yellow = 40;  // 40
+		const int min_yellow = 15;  // 15
+		const int max_yellow = 40;  // 40
 
-    // H range of white
+		// H range of white
 
-    const int min_white = 0;   // 15
-    const int max_white = 30;  // 40
+		const int min_white = 0;   // 15
+		const int max_white = 30;  // 40
 
-    Mat src_hsv;
+		Mat src_hsv;
 
-    // convert to HSV space
-    cvtColor(src, src_hsv, CV_BGR2HSV);
+		// convert to HSV space
+		cvtColor(src, src_hsv, CV_BGR2HSV);
 
-    std::vector<cv::Mat> hsvSplit;
-    split(src_hsv, hsvSplit);//é€šé“åˆ†ç¦» hsv,
-	/*
-	å¯¹å½©è‰²å›¾åƒè¿›è¡Œç›´æ–¹å›¾å‡è¡¡åŒ–ï¼Œä¸€èˆ¬æ˜¯é€šè¿‡å¯¹HSVè‰²å½©ç©ºé—´çš„Vé€šé“è¿›è¡Œç›´æ–¹å›¾å‡è¡¡åŒ–ï¼Œå†åˆå¹¶Hï¼ŒSï¼ŒVä¸‰ä¸ªé€šé“åè½¬åŒ–ä¸ºRGBç©ºé—´ã€‚
-	ï¼ˆå…¶å®Vé€šé“ç®€å•æ¥è¯´å°±æ˜¯å›¾åƒæ˜æš—é€šé“ï¼Œå¢åŠ Vé€šé“å€¼çš„æ•ˆæœç­‰åŒäºwindowsç…§ç‰‡ç¼–è¾‘ä¸­çš„å…‰çº¿è°ƒæ•´ï¼ŒSé€šé“åˆ™ç›¸å½“äºwindowsç…§ç‰‡ç¼–è¾‘ä¸­çš„é¢œè‰²è°ƒæ•´ï¼ˆé¥±å’Œåº¦ï¼‰ï¼‰
-	https://blog.csdn.net/normol/article/details/107834808
-	*/
-    equalizeHist(hsvSplit[2], hsvSplit[2]);//ç›´æ–¹å›¾å‡è¡¡åŒ–
-    merge(hsvSplit, src_hsv);
+		std::vector<cv::Mat> hsvSplit;
+		split(src_hsv, hsvSplit);//Í¨µÀ·ÖÀë hsv,
+		/*
+		¶Ô²ÊÉ«Í¼Ïñ½øĞĞÖ±·½Í¼¾ùºâ»¯£¬Ò»°ãÊÇÍ¨¹ı¶ÔHSVÉ«²Ê¿Õ¼äµÄVÍ¨µÀ½øĞĞÖ±·½Í¼¾ùºâ»¯£¬ÔÙºÏ²¢H£¬S£¬VÈı¸öÍ¨µÀºó×ª»¯ÎªRGB¿Õ¼ä¡£
+		£¨ÆäÊµVÍ¨µÀ¼òµ¥À´Ëµ¾ÍÊÇÍ¼ÏñÃ÷°µÍ¨µÀ£¬Ôö¼ÓVÍ¨µÀÖµµÄĞ§¹ûµÈÍ¬ÓÚwindowsÕÕÆ¬±à¼­ÖĞµÄ¹âÏßµ÷Õû£¬SÍ¨µÀÔòÏàµ±ÓÚwindowsÕÕÆ¬±à¼­ÖĞµÄÑÕÉ«µ÷Õû£¨±¥ºÍ¶È£©£©
+		https://blog.csdn.net/normol/article/details/107834808
+		*/
+		equalizeHist(hsvSplit[2], hsvSplit[2]);//Ö±·½Í¼¾ùºâ»¯
+		merge(hsvSplit, src_hsv);
 
-    // match to find the color
+		// match to find the color
 
-    int min_h = 0;
-    int max_h = 0;
-    switch (r) {
-    case BLUE:
-      min_h = min_blue;
-      max_h = max_blue;
-      break;
-    case YELLOW:
-      min_h = min_yellow;
-      max_h = max_yellow;
-      break;
-    case WHITE:
-      min_h = min_white;
-      max_h = max_white;
-      break;
-    default:
-      // Color::UNKNOWN
-      break;
-    }
+		int min_h = 0;
+		int max_h = 0;
+		switch (r) {
+		case BLUE:
+			min_h = min_blue;
+			max_h = max_blue;
+			break;
+		case YELLOW:
+			min_h = min_yellow;
+			max_h = max_yellow;
+			break;
+		case WHITE:
+			min_h = min_white;
+			max_h = max_white;
+			break;
+		default:
+			// Color::UNKNOWN
+			break;
+		}
 
-    float diff_h = float((max_h - min_h) / 2);
-    float avg_h = min_h + diff_h;
+		float diff_h = float((max_h - min_h) / 2);
+		float avg_h = min_h + diff_h;
 
-    int channels = src_hsv.channels();
-    int nRows = src_hsv.rows;
+		int channels = src_hsv.channels();
+		int nRows = src_hsv.rows;
 
-    // consider multi channel image
-    int nCols = src_hsv.cols * channels;
-    if (src_hsv.isContinuous()) {
-      nCols *= nRows;
-      nRows = 1;
-    }
+		// consider multi channel image
+		int nCols = src_hsv.cols * channels;
+		if (src_hsv.isContinuous()) {
+			nCols *= nRows;
+			nRows = 1;
+		}
 
-    int i, j;
-    uchar* p;
-    float s_all = 0;
-    float v_all = 0;
-    float count = 0;
-    for (i = 0; i < nRows; ++i) {
-      p = src_hsv.ptr<uchar>(i);
-      for (j = 0; j < nCols; j += 3) {
-        int H = int(p[j]);      // 0-180
-        int S = int(p[j + 1]);  // 0-255
-        int V = int(p[j + 2]);  // 0-255
+		int i, j;
+		uchar* p;
+		float s_all = 0;
+		float v_all = 0;
+		float count = 0;
+		//Ñ­»·ÀïµÄ¿´²»¶®
+		
+		for (i = 0; i < nRows; ++i) {
+			p = src_hsv.ptr<uchar>(i);
+			for (j = 0; j < nCols; j += 3) {
+				int H = int(p[j]);      // 0-180
+				int S = int(p[j + 1]);  // 0-255
+				int V = int(p[j + 2]);  // 0-255
 
-        s_all += S;
-        v_all += V;
-        count++;
+				s_all += S;
+				v_all += V;
+				count++;
 
-        bool colorMatched = false;
+				bool colorMatched = false;
 
-        if (H > min_h && H < max_h) {
-          float Hdiff = 0;
-          if (H > avg_h)
-            Hdiff = H - avg_h;
-          else
-            Hdiff = avg_h - H;
+				if (H > min_h && H < max_h) {
+					float Hdiff = 0;
+					if (H > avg_h)
+						Hdiff = H - avg_h;
+					else
+						Hdiff = avg_h - H;
 
-          float Hdiff_p = float(Hdiff) / diff_h;
+					float Hdiff_p = float(Hdiff) / diff_h;
 
-          float min_sv = 0;
-          if (true == adaptive_minsv)
-            min_sv =
-            minref_sv -
-            minref_sv / 2 *
-            (1
-            - Hdiff_p);  // inref_sv - minref_sv / 2 * (1 - Hdiff_p)
-          else
-            min_sv = minabs_sv;  // add
+					float min_sv = 0;
+					if (true == adaptive_minsv)
+						min_sv =
+						minref_sv -
+						minref_sv / 2 *
+						(1
+						- Hdiff_p);  // inref_sv - minref_sv / 2 * (1 - Hdiff_p)
+					else
+						min_sv = minabs_sv;  // add
 
-          if ((S > min_sv && S < max_sv) && (V > min_sv && V < max_sv))
-            colorMatched = true;
-        }
+					if ((S > min_sv && S < max_sv) && (V > min_sv && V < max_sv))
+						colorMatched = true;
+				}
 
-        if (colorMatched == true) {
-          p[j] = 0;
-          p[j + 1] = 0;
-          p[j + 2] = 255;
-        }
-        else {
-          p[j] = 0;
-          p[j + 1] = 0;
-          p[j + 2] = 0;
-        }
-      }
-    }
+				if (colorMatched == true) {
+					p[j] = 0;
+					p[j + 1] = 0;
+					p[j + 2] = 255;
+				}
+				else {
+					p[j] = 0;
+					p[j + 1] = 0;
+					p[j + 2] = 0;
+				}
+			}
+		}
 
-    // cout << "avg_s:" << s_all / count << endl;
-    // cout << "avg_v:" << v_all / count << endl;
+		// cout << "avg_s:" << s_all / count << endl;
+		// cout << "avg_v:" << v_all / count << endl;
 
-    // get the final binary
-
-
-    Mat src_grey;
-    std::vector<cv::Mat> hsvSplit_done;
-    split(src_hsv, hsvSplit_done);
-    src_grey = hsvSplit_done[2];
-	imshow("imgName", src_grey);
-	waitKey(0);
-    match = src_grey;
-
-    return src_grey;
-  }
-
-  bool bFindLeftRightBound1(Mat &bound_threshold, int &posLeft, int &posRight) {
-
-    float span = bound_threshold.rows * 0.2f;
-
-    for (int i = 0; i < bound_threshold.cols - span - 1; i += 3) {
-      int whiteCount = 0;
-      for (int k = 0; k < bound_threshold.rows; k++) {
-        for (int l = i; l < i + span; l++) {
-          if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
-            whiteCount++;
-          }
-        }
-      }
-      if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.15) {
-        posLeft = i;
-        break;
-      }
-    }
-    span = bound_threshold.rows * 0.2f;
+		// get the final binary
 
 
-    for (int i = bound_threshold.cols - 1; i > span; i -= 2) {
-      int whiteCount = 0;
-      for (int k = 0; k < bound_threshold.rows; k++) {
-        for (int l = i; l > i - span; l--) {
-          if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
-            whiteCount++;
-          }
-        }
-      }
+		Mat src_grey;
+		std::vector<cv::Mat> hsvSplit_done;
+		split(src_hsv, hsvSplit_done);
+		src_grey = hsvSplit_done[2];
 
-      if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.06) {
-        posRight = i;
-        if (posRight + 5 < bound_threshold.cols) {
-          posRight = posRight + 5;
-        } else {
-          posRight = bound_threshold.cols - 1;
-        }
+		match = src_grey;
 
-        break;
-      }
-    }
+		return src_grey;
+	}
 
-    if (posLeft < posRight) {
-      return true;
-    }
-    return false;
-  }
+	bool bFindLeftRightBound1(Mat &bound_threshold, int &posLeft, int &posRight) {
 
-  bool bFindLeftRightBound(Mat &bound_threshold, int &posLeft, int &posRight) {
+		float span = bound_threshold.rows * 0.2f;
 
-
-    float span = bound_threshold.rows * 0.2f;
-
-    for (int i = 0; i < bound_threshold.cols - span - 1; i += 2) {
-      int whiteCount = 0;
-      for (int k = 0; k < bound_threshold.rows; k++) {
-        for (int l = i; l < i + span; l++) {
-          if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
-            whiteCount++;
-          }
-        }
-      }
-      if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.36) {
-        posLeft = i;
-        break;
-      }
-    }
-    span = bound_threshold.rows * 0.2f;
+		for (int i = 0; i < bound_threshold.cols - span - 1; i += 3) {
+			int whiteCount = 0;
+			for (int k = 0; k < bound_threshold.rows; k++) {
+				for (int l = i; l < i + span; l++) {
+					if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
+						whiteCount++;
+					}
+				}
+			}
+			if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.15) {
+				posLeft = i;
+				break;
+			}
+		}
+		span = bound_threshold.rows * 0.2f;
 
 
-    for (int i = bound_threshold.cols - 1; i > span; i -= 2) {
-      int whiteCount = 0;
-      for (int k = 0; k < bound_threshold.rows; k++) {
-        for (int l = i; l > i - span; l--) {
-          if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
-            whiteCount++;
-          }
-        }
-      }
+		for (int i = bound_threshold.cols - 1; i > span; i -= 2) {
+			int whiteCount = 0;
+			for (int k = 0; k < bound_threshold.rows; k++) {
+				for (int l = i; l > i - span; l--) {
+					if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
+						whiteCount++;
+					}
+				}
+			}
 
-      if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.26) {
-        posRight = i;
-        break;
-      }
-    }
+			if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.06) {
+				posRight = i;
+				if (posRight + 5 < bound_threshold.cols) {
+					posRight = posRight + 5;
+				}
+				else {
+					posRight = bound_threshold.cols - 1;
+				}
 
-    if (posLeft < posRight) {
-      return true;
-    }
-    return false;
-  }
+				break;
+			}
+		}
 
-  bool bFindLeftRightBound2(Mat &bound_threshold, int &posLeft, int &posRight) {
+		if (posLeft < posRight) {
+			return true;
+		}
+		return false;
+	}
 
-    float span = bound_threshold.rows * 0.2f;
-
-    for (int i = 0; i < bound_threshold.cols - span - 1; i += 3) {
-      int whiteCount = 0;
-      for (int k = 0; k < bound_threshold.rows; k++) {
-        for (int l = i; l < i + span; l++) {
-          if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
-            whiteCount++;
-          }
-        }
-      }
-      if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.32) {
-        posLeft = i;
-        break;
-      }
-    }
-    span = bound_threshold.rows * 0.2f;
+	bool bFindLeftRightBound(Mat &bound_threshold, int &posLeft, int &posRight) {
 
 
-    for (int i = bound_threshold.cols - 1; i > span; i -= 3) {
-      int whiteCount = 0;
-      for (int k = 0; k < bound_threshold.rows; k++) {
-        for (int l = i; l > i - span; l--) {
-          if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
-            whiteCount++;
-          }
-        }
-      }
+		float span = bound_threshold.rows * 0.2f;
 
-      if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.22) {
-        posRight = i;
-        break;
-      }
-    }
+		for (int i = 0; i < bound_threshold.cols - span - 1; i += 2) {
+			int whiteCount = 0;
+			for (int k = 0; k < bound_threshold.rows; k++) {
+				for (int l = i; l < i + span; l++) {
+					if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
+						whiteCount++;
+					}
+				}
+			}
+			if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.36) {
+				posLeft = i;
+				break;
+			}
+		}
+		span = bound_threshold.rows * 0.2f;
 
-    if (posLeft < posRight) {
-      return true;
-    }
-    return false;
-  }
 
+		for (int i = bound_threshold.cols - 1; i > span; i -= 2) {
+			int whiteCount = 0;
+			for (int k = 0; k < bound_threshold.rows; k++) {
+				for (int l = i; l > i - span; l--) {
+					if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
+						whiteCount++;
+					}
+				}
+			}
+
+			if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.26) {
+				posRight = i;
+				break;
+			}
+		}
+
+		if (posLeft < posRight) {
+			return true;
+		}
+		return false;
+	}
+
+	bool bFindLeftRightBound2(Mat &bound_threshold, int &posLeft, int &posRight) {
+
+		float span = bound_threshold.rows * 0.2f;
+
+		for (int i = 0; i < bound_threshold.cols - span - 1; i += 3) {
+			int whiteCount = 0;
+			for (int k = 0; k < bound_threshold.rows; k++) {
+				for (int l = i; l < i + span; l++) {
+					if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
+						whiteCount++;
+					}
+				}
+			}
+			if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.32) {
+				posLeft = i;
+				break;
+			}
+		}
+		span = bound_threshold.rows * 0.2f;
+
+
+		for (int i = bound_threshold.cols - 1; i > span; i -= 3) {
+			int whiteCount = 0;
+			for (int k = 0; k < bound_threshold.rows; k++) {
+				for (int l = i; l > i - span; l--) {
+					if (bound_threshold.data[k * bound_threshold.step[0] + l] == 255) {
+						whiteCount++;
+					}
+				}
+			}
+
+			if (whiteCount * 1.0 / (span * bound_threshold.rows) > 0.22) {
+				posRight = i;
+				break;
+			}
+		}
+
+		if (posLeft < posRight) {
+			return true;
+		}
+		return false;
+	}
 
   bool plateColorJudge(const Mat &src, const Color r, const bool adaptive_minsv,
                        float &percent) {
@@ -298,14 +299,14 @@ namespace easypr {
     Mat src_gray;
     colorMatch(src, src_gray, r, adaptive_minsv);
 
-    percent =
-        float(countNonZero(src_gray)) / float(src_gray.rows * src_gray.cols);
-    // cout << "percent:" << percent << endl;
+    percent = float(countNonZero(src_gray)) / float(src_gray.rows * src_gray.cols);
+     cout << "percent:" << percent << endl;
 
-    if (percent > thresh)
-      return true;
-    else
-      return false;
+
+	 if (percent > thresh)
+		 return true;
+	 else
+		 return false; 
   }
 
   Color getPlateType(const Mat &src, const bool adaptive_minsv) {
@@ -509,6 +510,9 @@ void clearBorder(const Mat &img, Rect& cropRect) {
     }
   }
 
+  /*
+  OTSUËã·¨£¨×î´óÀà¼ä·½²î·¨£©
+  */
   int ThresholdOtsu(Mat mat) {
     int height = mat.rows;
     int width = mat.cols;
@@ -821,7 +825,7 @@ void clearBorder(const Mat &img, Rect& cropRect) {
   bool verifyPlateSize(Rect mr) {
     float error = 0.6f;
     // Spain car plate size: 52x11 aspect 4,7272
-    // China car plate size: 440mm*140mmï¼Œaspect 3.142857
+    // China car plate size: 440mm*140mm£¬aspect 3.142857
 
     // Real car plate size: 136 * 32, aspect 4
     float aspect = 3.75;
@@ -852,7 +856,7 @@ void clearBorder(const Mat &img, Rect& cropRect) {
   bool verifyRotatedPlateSizes(RotatedRect mr, bool showDebug) {
     float error = 0.65f;
     // Spain car plate size: 52x11 aspect 4,7272
-    // China car plate size: 440mm*140mmï¼Œaspect 3.142857
+    // China car plate size: 440mm*140mm£¬aspect 3.142857
 
     // Real car plate size: 136 * 32, aspect 4
     float aspect = 3.75f;
