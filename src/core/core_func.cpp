@@ -511,7 +511,7 @@ void clearBorder(const Mat &img, Rect& cropRect) {
   }
 
   /*
-  OTSU算法（最大类间方差法）
+  OTSU算法（最大类间方差法）,获取最佳阈值，达到最佳分割效果
   */
   int ThresholdOtsu(Mat mat) {
     int height = mat.rows;
